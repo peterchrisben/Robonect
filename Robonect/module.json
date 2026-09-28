@@ -3,12 +3,16 @@
   "name": "Robonect Wifi Modul",
   "type": 3,
   "vendor": "Robonect",
-  "aliases":
-  [
+  "aliases": [
     "Robonect HX"
   ],
-  "parentRequirements": ["{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}"],
+  "url": "https://github.com/IPSCoyote/Robonect",
+  "parentRequirements": [
+    "{043EA491-0325-4ADD-8FC2-A30C8EEB4D3F}"
+  ],
   "childRequirements": [],
-  "implemented": ["{018EF6B5-AB94-40C6-AA53-46943E824ACF}"],
-  "prefix": "Robonect"
+  "implemented": [
+    "{7F7632D9-FA40-4F38-A279-F0BE5EB3D1B6}"
+  ],
+  "prefix": "ROBONECT"
 }

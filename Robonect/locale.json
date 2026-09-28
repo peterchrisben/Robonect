@@ -3,33 +3,37 @@
     "de": {
       "Disclaimer": "Dieses Modul wurde unabhängig vom Hersteller des Robonect Moduls entwickelt. Die Benutzung des Moduls erfolgt auf eigene Gefahr unter Ausschluss jeglicher Gewährleistung für Probleme oder Schäden am Robonect Modul.",
       "Donation": "Das Modul ist ein Hobby. Wer sich mit einer kleinen Spende für dessen Entwicklung (ohne Recht auf irgendwelche Ansprüche) bedanken möchte, kann dies gerne via Paypal-Spende machen:",
-
       "Login": "Login Daten des Robonect Moduls (benötigt zum Lesen sowie zur Steuerung)",
       "Username": "Benutzername",
       "Password": "Passwort",
-
-      "AutomaticUpdate": "Automatische Updates (bei MQTT-Nutzung sollte das Intervall höher sein, aber MQTT liefert nicht alles!)",
+      "AutomaticUpdate": "Automatische Updates",
       "UpdateTimer": "Update alle",
       "seconds": "Sekunden",
-
-      "MQTT Topic Label": "MQTT Topic",
+      "MQTT Topic Label": "MQTT (optional)",
       "MQTTTopic": "Eingestelltes MQTT Topic im Robonect Modul",
-
       "DefaultValues": "Vorgabewerte",
       "MowingTime": "Mähzeit bei Sofortstart",
       "minutes": "Minuten",
-
       "Debugging": "Debugging Tools",
       "DebugLog": "Debug Logging aktivieren",
-
       "Check Connection": "Verbindung testen",
-
       "Robonect identified": "Robonect gefunden",
       "Configuration missing": "Konfiguration fehlt",
       "IP invalid": "IP Adresse ungültig",
       "No device found on IP": "Kein Gerät antwortet an der IP Adresse",
       "No JSON returned from IP": "Kein JSON wird an der IP Adresse geliefert",
-      "No Robonect available at IP": "Kein Robonect an IP Adresse erreichbar"
+      "No Robonect available at IP": "Kein Robonect an IP Adresse erreichbar",
+      "AutomaticUpdateActive": "Automatische Updates aktivieren (bei MQTT-Nutzung darf das Intervall höher sein, MQTT liefert aber nicht alles!)",
+      "UpdateErrorsWithStatus": "Fehlerliste bei jedem Update mit abrufen",
+      "MQTTHint": "Für Echtzeit-Daten per MQTT: Instanz über \"Gateway ändern\" mit einem Symcon MQTT-Server verbinden und im Robonect-Webinterface (Kommunikation → MQTT-Client) diesen als Broker eintragen.",
+      "Update error list": "Fehlerliste abrufen",
+      "Read timer from mower": "Timer vom Robonect lesen",
+      "Write timer to mower": "Timer an Robonect übertragen",
+      "Clear errors": "Fehler löschen",
+      "Timer im Robonect überschreiben?": "Timer im Robonect überschreiben?",
+      "Fehlerspeicher im Robonect löschen?": "Fehlerspeicher im Robonect löschen?",
+      "Login failed": "Anmeldung fehlgeschlagen (Benutzer/Passwort prüfen)",
+      "IP-Adresse": "IP-Adresse"
     }
   }
 }

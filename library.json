@@ -1,11 +1,12 @@
-
 {
   "id": "{6CD4C031-4CA9-A74E-7ADE-D95F8540EA55}",
   "author": "Coyote",
   "name": "Robonect",
   "url": "https://github.com/IPSCoyote/Robonect",
-  "compatibility": { "version": "5.0", "date": 1580428800 },
-  "version": "1.1",
-  "build": 0,
-  "date": 0
+  "compatibility": {
+    "version": "8.0"
+  },
+  "version": "2.0",
+  "build": 1,
+  "date": 1790614281
 }
