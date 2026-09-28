@@ -1,0 +1,18 @@
+{
+  "id": "{B5E94E1B-5131-4DAC-BE1F-F7B8F940076E}",
+  "name": "Robonect MQTT",
+  "type": 3,
+  "vendor": "Robonect",
+  "aliases": [
+    "Robonect MQTT"
+  ],
+  "url": "https://github.com/IPSCoyote/Robonect",
+  "parentRequirements": [
+    "{043EA491-0325-4ADD-8FC2-A30C8EEB4D3F}"
+  ],
+  "childRequirements": [],
+  "implemented": [
+    "{7F7632D9-FA40-4F38-A279-F0BE5EB3D1B6}"
+  ],
+  "prefix": "ROBONECTMQTT"
+}

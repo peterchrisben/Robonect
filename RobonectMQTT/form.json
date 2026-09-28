@@ -1,0 +1,44 @@
+{
+  "elements": [
+    {
+      "type": "Label",
+      "caption": "MQTTIntro"
+    },
+    {
+      "type": "SelectInstance",
+      "name": "RobonectInstance",
+      "caption": "Robonect instance",
+      "validModules": [
+        "{169FA82D-CFA6-EF9C-6490-AFFC882D0181}"
+      ]
+    },
+    {
+      "type": "ValidationTextBox",
+      "name": "MQTTTopic",
+      "caption": "MQTTTopic"
+    },
+    {
+      "type": "CheckBox",
+      "name": "DebugLog",
+      "caption": "DebugLog"
+    }
+  ],
+  "actions": [],
+  "status": [
+    {
+      "code": 102,
+      "icon": "active",
+      "caption": "Ready"
+    },
+    {
+      "code": 200,
+      "icon": "inactive",
+      "caption": "Topic missing"
+    },
+    {
+      "code": 201,
+      "icon": "error",
+      "caption": "No Robonect instance selected"
+    }
+  ]
+}

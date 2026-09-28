@@ -6,17 +6,15 @@ declare(strict_types=1);
  * Robonect Wifi Modul
  *
  * Einbindung eines Mähroboters mit Robonect-WLAN-Modul (z. B. Robonect HX) in IP-Symcon.
- * Die Daten werden per HTTP (JSON-API des Robonect-Moduls) abgefragt und können zusätzlich
- * per MQTT (Symcon MQTT-Server) in Echtzeit empfangen werden.
+ * Die Daten werden per HTTP (JSON-API des Robonect-Moduls) abgefragt. Optional liefert die
+ * Instanz "Robonect MQTT" (Kind des Symcon MQTT-Servers) Werte in Echtzeit über ProcessMQTT.
+ * Diese Instanz selbst benötigt daher keine übergeordnete Instanz.
  *
  * Öffentliche Funktionen stehen mit dem Präfix ROBONECT (bzw. Robonect) zur Verfügung, z. B.:
  *   ROBONECT_Update($InstanzID);
  */
 class RobonectWifiModul extends IPSModule
 {
-    // Datenfluss Symcon MQTT-Server
-    private const MQTT_TX = '{043EA491-0325-4ADD-8FC2-A30C8EEB4D3F}';
-
     // Wochentage in der Reihenfolge des Symcon Wochenplans (0 = Montag)
     private const WEEKDAYS = ['mo', 'tu', 'we', 'th', 'fr', 'sa', 'su'];
 
@@ -79,9 +77,6 @@ class RobonectWifiModul extends IPSModule
         $this->RegisterPropertyInteger('UpdateTimer', 10);
         $this->RegisterPropertyBoolean('UpdateErrorsWithStatus', false);
 
-        // MQTT
-        $this->RegisterPropertyString('MQTTTopic', '');
-
         // Vorgabewerte
         $this->RegisterPropertyInteger('MowingTime', 180);
 
@@ -101,9 +96,6 @@ class RobonectWifiModul extends IPSModule
 
         // Zusammenfassung in der Instanzliste
         $this->SetSummary($this->ReadPropertyString('IPAddress'));
-
-        // MQTT: nur Nachrichten des eingestellten Topics an diese Instanz durchlassen
-        $this->SetReceiveDataFilter($this->buildReceiveDataFilter(trim($this->ReadPropertyString('MQTTTopic'))));
 
         // Timer
         $this->updateTimerInterval();
@@ -482,32 +474,17 @@ class RobonectWifiModul extends IPSModule
         }
     }
 
-    public function ReceiveData($JSONString)
+    public function ProcessMQTT(string $Topic, string $Payload): bool
     {
-        // Daten vom Symcon MQTT-Server
-        $data = json_decode($JSONString, true);
-        if (!is_array($data) || !isset($data['Topic'], $data['Payload'])) {
-            return '';
-        }
-
-        $mqttTopic = rtrim(trim($this->ReadPropertyString('MQTTTopic')), '/');
-        if ($mqttTopic == '' || strpos($data['Topic'], $mqttTopic . '/') !== 0) {
-            return '';
-        }
-
-        // Der MQTT-Server liefert die Nutzdaten ab IP-Symcon 6.3 zusätzlich UTF-8 kodiert
-        $payload = (string) $data['Payload'];
-        if (IPS_GetKernelDate() > 1670886000) {
-            $payload = mb_convert_encoding($payload, 'ISO-8859-1', 'UTF-8');
-        }
-        $payload = $this->cleanPayload($payload);
-
-        $topic = strtolower(substr($data['Topic'], strlen($mqttTopic)));
+        // Wird von der Instanz "Robonect MQTT" aufgerufen.
+        // $Topic ist relativ zum eingestellten Robonect-Topic, z. B. "/mower/status"
+        $topic = strtolower('/' . ltrim(trim($Topic), '/'));
+        $payload = $this->cleanPayload($Payload);
         $this->log('MQTT', $topic . ' = ' . $payload);
 
         if (!isset(self::MQTT_TOPICS[$topic])) {
             $this->log('MQTT', 'Unbekanntes Topic: ' . $topic);
-            return '';
+            return false;
         }
 
         $ident = self::MQTT_TOPICS[$topic];
@@ -515,7 +492,7 @@ class RobonectWifiModul extends IPSModule
         if ($ident != 'mowerMqttStatus') {
             $this->SetValue('mowerMqttStatus', 1); // Daten kommen an => online
         }
-        return '';
+        return true;
     }
 
     //=== Interne Funktionen =========================================================================
@@ -814,21 +791,6 @@ class RobonectWifiModul extends IPSModule
             $payload = $matches[1];
         }
         return $payload;
-    }
-
-    private function buildReceiveDataFilter(string $topic): string
-    {
-        $topic = rtrim($topic, '/');
-        if ($topic == '') {
-            // ohne Topic keine MQTT-Daten verarbeiten
-            return '.*"Topic":"-ROBONECT-NO-TOPIC-".*';
-        }
-        // Schrägstriche können im JSON als "\/" maskiert sein
-        $parts = array_map(function (string $part): string
-        {
-            return preg_quote($part, '/');
-        }, explode('/', $topic));
-        return '.*"Topic":"' . implode('\\\\?\/', $parts) . '\\\\?\/.*';
     }
 
     private function buildErrorListHTML(array $errors): string

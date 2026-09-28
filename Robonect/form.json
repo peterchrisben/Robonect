@@ -77,11 +77,6 @@
         {
           "type": "Label",
           "caption": "MQTTHint"
-        },
-        {
-          "type": "ValidationTextBox",
-          "name": "MQTTTopic",
-          "caption": "MQTTTopic"
         }
       ]
     },

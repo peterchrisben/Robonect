@@ -1,0 +1,13 @@
+{
+  "translations": {
+    "de": {
+      "MQTTIntro": "Empfängt die MQTT-Nachrichten des Robonect-Moduls über den Symcon MQTT-Server und gibt sie an die ausgewählte Robonect-Instanz weiter. Im Robonect-Webinterface (Kommunikation → MQTT-Client) muss IP-Symcon als Broker mit demselben Topic eingetragen sein.",
+      "Robonect instance": "Robonect-Instanz",
+      "MQTTTopic": "Eingestelltes MQTT Topic im Robonect Modul",
+      "DebugLog": "Debug Logging aktivieren",
+      "Ready": "Bereit",
+      "Topic missing": "MQTT Topic fehlt",
+      "No Robonect instance selected": "Keine Robonect-Instanz ausgewählt"
+    }
+  }
+}

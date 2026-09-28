@@ -7,12 +7,8 @@
     "Robonect HX"
   ],
   "url": "https://github.com/IPSCoyote/Robonect",
-  "parentRequirements": [
-    "{043EA491-0325-4ADD-8FC2-A30C8EEB4D3F}"
-  ],
+  "parentRequirements": [],
   "childRequirements": [],
-  "implemented": [
-    "{7F7632D9-FA40-4F38-A279-F0BE5EB3D1B6}"
-  ],
+  "implemented": [],
   "prefix": "ROBONECT"
 }

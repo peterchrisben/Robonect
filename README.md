@@ -29,7 +29,7 @@ Das Modul ist für die Handhabung von lokalen Mährobotern via eingebauten [Robo
 Das Ziel des Moduls ist eine bessere und simple Einbindung in die IP-Symcon Haussteuerung:
 
 - Abfrage von Status, Akku, Spannungen, Klima, Messer, WLAN, GPS, Timer und Fehlerspeicher per HTTP (lokal, ohne Cloud)
-- optional Empfang der Daten in Echtzeit per MQTT über den in IP-Symcon eingebauten MQTT-Server
+- optional Empfang der Daten in Echtzeit per MQTT über den in IP-Symcon eingebauten MQTT-Server (eigene Instanz "Robonect MQTT")
 - Steuerung (Modus, jetzt mähen, Pause, nach Hause, Aufträge planen) über Skript-Funktionen und direkt in der Visualisierung
 - Übertragung der Mäh-Timer zwischen Robonect und einem Symcon Wochenplan in beide Richtungen
 
@@ -68,14 +68,7 @@ Hier kann man die automatischen Updates des Moduls sowie das zugehörige Zeitint
 Mit **Fehlerliste bei jedem Update mit abrufen** wird bei jedem Update auch der Fehlerspeicher gelesen. Ein eigenes Ereignis mit `ROBONECT_UpdateErrorList` ist dann nicht mehr nötig.
 
 #### MQTT (optional)
-Über MQTT sendet das Robonect-Modul Änderungen sofort an IP-Symcon. Dafür wird der in IP-Symcon eingebaute MQTT-Server genutzt:
-
-1. In der Robonect-Instanz auf **Gateway ändern** klicken und einen **MQTT Server** auswählen bzw. neu anlegen (IP-Symcon legt dabei auch den zugehörigen Server Socket an, Standard-Port 1883).
-2. Im MQTT Server ggf. Benutzername und Passwort vergeben.
-3. Im Robonect-Webinterface unter *Kommunikation → MQTT-Client* die IP-Adresse von IP-Symcon als Broker, den Port und ggf. Benutzer/Passwort eintragen und ein Topic festlegen (z. B. `Robonect`).
-4. Dasselbe Topic in der Robonect-Instanz unter **MQTT Topic** eintragen. Das Modul reagiert nur auf dieses Topic.
-
-Wird MQTT nicht genutzt, bleibt das Feld leer. IP-Symcon zeigt dann in der Instanz den Hinweis an, dass keine übergeordnete Instanz vorhanden ist - das Modul funktioniert per HTTP trotzdem vollständig.
+Die Robonect-Instanz selbst braucht keine übergeordnete Instanz - beim Anlegen erscheint daher keine Abfrage einer Schnittstelle. Wer die Daten zusätzlich in Echtzeit per MQTT empfangen möchte, legt eine zweite Instanz **Robonect MQTT** an (siehe [4.2](#42-robonect-mqtt)).
 
 #### Vorgabewerte
 Hier können ggf. notwendige Defaultwerte festgelegt werden. So kann man das Mähen des Mähroboters mit einem Befehl starten, der eine Mähdauer erwartet (oder z. B. über die Visualisierung direkt). Die dann benötigte Mähzeit wird hier festgelegt.
@@ -240,6 +233,28 @@ ACHTUNG! Die bestehenden Timer im Rasenmäher werden überschrieben!
 ROBONECT_SetTimerToMower( $Instanz ); // Übertragen der Timer
 ```
 
+#### ProcessMQTT( int $Instanz, string $Topic, string $Payload )
+Wird von der Instanz "Robonect MQTT" aufgerufen und muss normalerweise nicht selbst genutzt werden. `$Topic` ist relativ zum Robonect-Topic, z. B. `/mower/status`.
+
+### 4.2 Robonect MQTT
+
+Optionale Instanz, die die MQTT-Nachrichten des Robonect-Moduls über den in IP-Symcon eingebauten MQTT-Server empfängt und an die ausgewählte Robonect-Instanz weitergibt. Damit werden Werte sofort aktualisiert und zusätzliche Werte (z. B. Status und Substatus im Klartext) geliefert.
+
+Einrichtung:
+
+1. Instanz **Robonect MQTT** anlegen. Sie wird automatisch mit einem vorhandenen MQTT Server verbunden bzw. IP-Symcon legt einen an (inkl. Server Socket, Standard-Port 1883).
+2. Im MQTT Server ggf. Benutzername und Passwort vergeben.
+3. Im Robonect-Webinterface unter *Kommunikation → MQTT-Client* die IP-Adresse von IP-Symcon als Broker, den Port und ggf. Benutzer/Passwort eintragen und ein Topic festlegen (z. B. `Robonect`).
+4. In der Instanz **Robonect MQTT** die Robonect-Instanz auswählen und dasselbe Topic eintragen.
+
+|Einstellung | Bedeutung |
+| :--- | :--- |
+|`Robonect-Instanz` | Instanz des Robonect Wifi Moduls, die die Werte erhalten soll |
+|`MQTT Topic` | Das im Robonect-Modul eingestellte Topic. Es werden nur Nachrichten dieses Topics verarbeitet. |
+|`Debug Logging` | Zeigt die empfangenen Nachrichten im Debug-Fenster der Instanz |
+
+Bei mehreren Mährobotern wird pro Mäher eine eigene Robonect MQTT-Instanz mit eigenem Topic angelegt.
+
 ## 5. Versionshistorie
 
 ### Version 2.0
@@ -247,11 +262,12 @@ ROBONECT_SetTimerToMower( $Instanz ); // Übertragen der Timer
 
 **Bitte beachten (manuell tätig werden):**
 - Mindestversion ist jetzt IP-Symcon 8.0.
-- MQTT läuft jetzt über den in IP-Symcon eingebauten **MQTT Server** statt über einen einfachen Server Socket. Wer MQTT genutzt hat: die alte Server Socket-Instanz löschen und wie unter [MQTT (optional)](#mqtt-optional) beschrieben einrichten. Wer MQTT nicht nutzt, muss nichts tun.
+- Die Robonect-Instanz braucht keine übergeordnete Instanz mehr (keine Abfrage beim Anlegen, kein Hinweis "benötigt eine übergeordnete Instanz"). MQTT läuft jetzt über die neue Instanz **Robonect MQTT** und den in IP-Symcon eingebauten **MQTT Server** statt über einen einfachen Server Socket. Wer MQTT genutzt hat: die alte Server Socket-Instanz löschen und wie unter [4.2](#42-robonect-mqtt) beschrieben einrichten. Wer MQTT nicht nutzt, muss nichts tun.
 - Die Variablen nutzen jetzt Darstellungen statt eigener Variablenprofile. Die alten Profile `ROBONECT_*` werden nicht mehr benötigt und können gelöscht werden, sofern sie nicht anderweitig verwendet werden.
 - Wer `UpdateErrorList` bisher über ein eigenes Ereignis aufgerufen hat, kann stattdessen **Fehlerliste bei jedem Update mit abrufen** aktivieren.
 
 Neu:
+- Instanz "Robonect MQTT" für den Empfang per MQTT
 - Variablen "Robonect erreichbar", "Letzte Aktualisierung", "Aktueller Fehler" und "Entfernung zur Ladestation"
 - Option "Fehlerliste bei jedem Update mit abrufen"
 - Instanzstatus "Anmeldung fehlgeschlagen" bei falschem Benutzer/Passwort
