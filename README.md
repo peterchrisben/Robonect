@@ -284,6 +284,8 @@ Fehlerbehebungen:
 - Externe Spannung wurde in mV statt V angezeigt
 - HTML-Tabelle der Fehlermeldungen war fehlerhaft aufgebaut
 - Verbindungsfehler wurden nicht erkannt (kürzere Timeouts, Status wird korrekt gesetzt)
+- Antworten mit Umlauten, die nicht als UTF-8 kodiert sind (z. B. in der Fehlerliste), werden jetzt gelesen
+- Robonect-Module ohne GPS führen nicht mehr zu einem Fehlerstatus der Instanz
 
 ### Version 1.1
 Fehlerbehebungen und Erweiterung um GPS Daten

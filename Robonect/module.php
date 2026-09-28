@@ -132,7 +132,7 @@ class RobonectWifiModul extends IPSModule
             }
 
             // Health (Spannungen)
-            $data = $this->executeHTTPCommand('health');
+            $data = $this->executeHTTPCommand('health', true);
             if ($data !== false && !empty($data['successful'])) {
                 if (isset($data['health']['voltages']['int3v3'])) {
                     $this->updateIdent('mowerVoltageInternal', $data['health']['voltages']['int3v3']);
@@ -152,7 +152,7 @@ class RobonectWifiModul extends IPSModule
             }
 
             // GPS (nur wenn das Robonect-Modul GPS unterstützt)
-            $data = $this->executeHTTPCommand('gps');
+            $data = $this->executeHTTPCommand('gps', true);
             if ($data !== false && !empty($data['successful'])) {
                 if (isset($data['gps']['latitude'])) {
                     $this->updateIdent('mowerGpsLatitudeRaw', $data['gps']['latitude']);
@@ -184,7 +184,7 @@ class RobonectWifiModul extends IPSModule
         }
 
         try {
-            $data = $this->executeHTTPCommand('error');
+            $data = $this->executeHTTPCommand('error', true);
             if ($data === false || empty($data['successful']) || !isset($data['errors']) || !is_array($data['errors'])) {
                 // Das Robonect-Modul liefert die Fehlerliste nicht immer zuverlässig
                 $this->log('UpdateErrorList', 'Keine gültige Fehlerliste erhalten');
@@ -578,7 +578,7 @@ class RobonectWifiModul extends IPSModule
         return ($data !== false) && !empty($data['successful']);
     }
 
-    private function executeHTTPCommand(string $command): array|false
+    private function executeHTTPCommand(string $command, bool $optional = false): array|false
     {
         $IPAddress = trim($this->ReadPropertyString('IPAddress'));
         $Username = trim($this->ReadPropertyString('Username'));
@@ -629,21 +629,43 @@ class RobonectWifiModul extends IPSModule
 
         $this->log('HTTP', 'Antwort (HTTP ' . $httpCode . '): ' . $response);
 
-        $data = json_decode((string) $response, true);
+        $data = $this->decodeJSON((string) $response);
         if (!is_array($data)) {
-            $this->setOnline(false);
-            $this->setStatusIfChanged(self::STATUS_NO_JSON);
+            $this->log('HTTP', 'Antwort auf cmd=' . $command . ' ist kein gültiges JSON: ' . json_last_error_msg());
+            if (!$optional) {
+                $this->setOnline(false);
+                $this->setStatusIfChanged(self::STATUS_NO_JSON);
+            }
             return false;
         }
         if (!array_key_exists('successful', $data)) {
-            $this->setOnline(false);
-            $this->setStatusIfChanged(self::STATUS_NO_ROBONECT);
+            if (!$optional) {
+                $this->setOnline(false);
+                $this->setStatusIfChanged(self::STATUS_NO_ROBONECT);
+            }
             return false;
         }
 
         $this->setOnline(true);
         $this->setStatusIfChanged(self::STATUS_OK);
         return $data;
+    }
+
+    private function decodeJSON(string $response): ?array
+    {
+        $data = json_decode($response, true);
+        if (is_array($data)) {
+            return $data;
+        }
+        // Manche Firmware-Stände liefern Umlaute nicht als UTF-8 (z. B. in Fehlermeldungen)
+        if (!mb_check_encoding($response, 'UTF-8')) {
+            $data = json_decode(mb_convert_encoding($response, 'UTF-8', 'Windows-1252'), true);
+            if (is_array($data)) {
+                return $data;
+            }
+        }
+        $data = json_decode($response, true, 512, JSON_INVALID_UTF8_SUBSTITUTE);
+        return is_array($data) ? $data : null;
     }
 
     private function updateIdent(string $ident, mixed $payload): void
